@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/python-3.10+-brightgreen.svg)](pyproject.toml)
 [![CI](https://github.com/yevheniikravchuk/pterasim-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/yevheniikravchuk/pterasim-mcp/actions/workflows/ci.yml)
 
-Reusable Pterasim integration for Model Context Protocol services. It exposes typed request/response models, a FastAPI surface, and an analytic fallback when the native `pterasim` module is unavailable.
+Model Context Protocol integration for the [Pterasim](https://github.com/wnordmann/pterasim) flapping-wing solver. It exposes typed request/response models, a FastAPI surface, and an analytic fallback when the native `pterasim` module is unavailable.
 
 ## Features
 
