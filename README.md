@@ -1,57 +1,117 @@
-# pterasim-mcp
+# pterasim-mcp · Guided Flight for Flapping-Wing Learners
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10+-brightgreen.svg)](pyproject.toml)
 [![CI](https://github.com/yevheniikravchuk/pterasim-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/yevheniikravchuk/pterasim-mcp/actions/workflows/ci.yml)
 
-Model Context Protocol integration for the [Pterasim](https://github.com/wnordmann/pterasim) flapping-wing solver. It exposes typed request/response models, a FastAPI surface, and an analytic fallback when the native `pterasim` module is unavailable.
+`pterasim-mcp` wraps [Pterasim](https://github.com/wnordmann/pterasim)—and provides an analytic fallback—so you can teach an MCP agent how flapping wings generate thrust, lift, and torque. The goal is to make aerodynamic experimentation approachable even if you are new to UVLM solvers.
 
-## Why you might want this
+## Learning objectives
 
-- **Automate flapping-wing studies** – call `pterasim.simulate_wing` from agents without crafting bespoke glue code.
-- **Keep pipelines running without CUDA** – the analytic fallback estimates thrust/lift so CI or laptops can still produce meaningful numbers.
-- **Archive context** – request/response models make it easy to log every assumption that went into a simulation run.
+- Understand the input parameters that govern flapping-wing performance.
+- Run the simulator (or the deterministic fallback) from Python and interpret the results.
+- Expose the capability through an MCP tool so assistants can compare wing designs in real time.
 
-## Features
+## Requirements
 
-- `simulate` helper that calls `pterasim.simulate_wing` when installed, otherwise returns a lift/drag/thrust estimate.
-- FastAPI app factory (`create_app`) for HTTP deployments.
-- python-sdk tool registration helper for STDIO-based agents.
+| Component | Why it matters |
+|-----------|----------------|
+| `pterasim` Python package (optional) | Installs the full UVLM solver. If missing, the analytic fallback still provides useful estimates. |
+| Python 3.10+ & `uv` | For installation and examples. |
+| NumPy/Matplotlib (optional) | Handy for plotting thrust or lift traces. |
 
-## Installation
+Install Pterasim if you want the high-fidelity solver:
 
 ```bash
-pip install "git+https://github.com/yevheniikravchuk/pterasim-mcp.git"
+pip install PteraSoftware
 ```
 
-## Usage
+## Step 1 – Install the MCP helper
+
+```bash
+uv pip install "git+https://github.com/yevheniikravchuk/pterasim-mcp.git"
+```
+
+## Step 2 – Simulate a baseline wing
 
 ```python
 from pterasim_mcp import PterasimInput, simulate_pterasim
 
 inputs = PterasimInput(
-    span_m=0.8,
+    span_m=0.7,
     mean_chord_m=0.12,
     stroke_frequency_hz=6.0,
     stroke_amplitude_rad=0.35,
     cruise_velocity_m_s=8.0,
     air_density_kg_m3=1.2,
-    cl_alpha_per_rad=5.7,
+    cl_alpha_per_rad=5.5,
     cd0=0.02,
     planform_area_m2=0.18,
-    tail_moment_arm_m=0.25,
 )
-output = simulate_pterasim(inputs)
-print(output.thrust_N)
+
+outputs = simulate_pterasim(inputs)
+print(outputs)
 ```
 
-## Development
+If `pterasim` is available the solver returns UVLM-based thrust, lift, and torque. Otherwise the wrapper computes a physics-informed approximation useful for prototyping and unit tests.
+
+## Step 3 – Compare design tweaks
+
+```python
+for freq in [5.0, 6.0, 7.0]:
+    trial = inputs.model_copy(update={"stroke_frequency_hz": freq})
+    perf = simulate_pterasim(trial)
+    print(f"{freq} Hz -> thrust {perf.thrust_N:.2f} N, lift {perf.lift_N:.2f} N")
+```
+
+Use the loop above to build an intuition for how frequency or stroke amplitude affect performance.
+
+## Step 4 – Share the simulator via MCP
+
+### FastAPI service
+
+```python
+from pterasim_mcp.fastapi_app import create_app
+
+app = create_app()
+```
+
+Run locally:
+
+```bash
+uv run uvicorn pterasim_mcp.fastapi_app:create_app --factory --port 8003
+```
+
+### python-sdk tool
+
+```python
+from mcp.server.fastmcp import FastMCP
+from pterasim_mcp.tool import build_tool
+
+mcp = FastMCP("pterasim-mcp", "Flapping wing simulation")
+build_tool(mcp)
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+Now your MCP-aware agent can evaluate alternative wing plans on demand.
+
+## Experiment ideas
+
+- **Mission profiling:** sweep cruise velocities to identify lift margins throughout a flight segment.
+- **Material study:** combine outputs with ctrltest-mcp to see how actuator limits interact with aerodynamic loads.
+- **Curriculum project:** ask students to hit a target thrust while minimising torque using the MCP tool.
+
+## Contributing & tests
 
 ```bash
 uv pip install --system -e .[dev]
 uv run ruff check .
 uv run pytest
 ```
+
+Tests cover both the UVLM path (when the module is present) and the fallback to keep behaviour predictable.
 
 ## License
 
