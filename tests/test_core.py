@@ -25,6 +25,7 @@ def sample_input() -> PterasimInput:
 
 
 def test_simulate_fallback(sample_input: PterasimInput) -> None:
+    """Even without Pterasim installed we should estimate forces."""
     output = simulate_pterasim(sample_input)
     assert output.thrust_N > 0.0
     assert output.lift_N > 0.0
@@ -32,6 +33,7 @@ def test_simulate_fallback(sample_input: PterasimInput) -> None:
 
 
 def test_simulate_with_native_module(sample_input: PterasimInput) -> None:
+    """When the real module is present we proxy straight through."""
     fake_module = mock.Mock()
     fake_module.simulate_wing.return_value = mock.Mock(
         thrust=12.3,

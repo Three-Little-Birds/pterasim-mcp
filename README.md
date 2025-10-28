@@ -6,6 +6,12 @@
 
 Model Context Protocol integration for the [Pterasim](https://github.com/wnordmann/pterasim) flapping-wing solver. It exposes typed request/response models, a FastAPI surface, and an analytic fallback when the native `pterasim` module is unavailable.
 
+## Why you might want this
+
+- **Automate flapping-wing studies** – call `pterasim.simulate_wing` from agents without crafting bespoke glue code.
+- **Keep pipelines running without CUDA** – the analytic fallback estimates thrust/lift so CI or laptops can still produce meaningful numbers.
+- **Archive context** – request/response models make it easy to log every assumption that went into a simulation run.
+
 ## Features
 
 - `simulate` helper that calls `pterasim.simulate_wing` when installed, otherwise returns a lift/drag/thrust estimate.
