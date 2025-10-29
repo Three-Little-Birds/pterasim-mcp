@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/python-3.10+-brightgreen.svg)](pyproject.toml)
 [![CI](https://github.com/yevheniikravchuk/pterasim-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/yevheniikravchuk/pterasim-mcp/actions/workflows/ci.yml)
 
-`pterasim-mcp` wraps [Pterasim](https://github.com/wnordmann/pterasim)—and provides an analytic fallback—so you can teach an MCP agent how flapping wings generate thrust, lift, and torque. The goal is to make aerodynamic experimentation approachable even if you are new to UVLM solvers.
+`pterasim-mcp` wraps [PteraSoftware](https://github.com/camUrban/PteraSoftware) when it is available—and falls back to a lightweight analytic surrogate otherwise—so you can teach an MCP agent how flapping wings generate thrust, lift, and torque. The goal is to make aerodynamic experimentation approachable even if you are new to UVLM solvers.
 
 ## Learning objectives
 
@@ -16,11 +16,11 @@
 
 | Component | Why it matters |
 |-----------|----------------|
-| `pterasim` Python package (optional) | Installs the full UVLM solver. If missing, the analytic fallback still provides useful estimates. |
+| `PteraSoftware` Python package (optional) | Installs the full UVLM solver. If missing, the analytic fallback still provides useful estimates. |
 | Python 3.10+ & `uv` | For installation and examples. |
 | NumPy/Matplotlib (optional) | Handy for plotting thrust or lift traces. |
 
-Install Pterasim if you want the high-fidelity solver:
+Install PteraSoftware if you want the high-fidelity solver:
 
 ```bash
 pip install PteraSoftware

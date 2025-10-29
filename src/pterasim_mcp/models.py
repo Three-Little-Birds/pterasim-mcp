@@ -16,9 +16,14 @@ class PterasimInput(BaseModel):
     cd0: float = Field(..., ge=0.0)
     planform_area_m2: float = Field(..., gt=0.0)
     tail_moment_arm_m: float | None = Field(default=None, ge=0.0)
+    prefer_high_fidelity: bool = Field(
+        default=True,
+        description="Attempt to use PteraSoftware when available before falling back to the analytic surrogate.",
+    )
 
 
 class PterasimOutput(BaseModel):
     thrust_N: float
     lift_N: float
     torque_Nm: float
+    metadata: dict[str, object] | None = Field(default=None, description="Solver details and diagnostics")

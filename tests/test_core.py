@@ -5,7 +5,7 @@ from unittest import mock
 import pytest
 
 from pterasim_mcp.core import simulate_pterasim
-from pterasim_mcp.models import PterasimInput
+from pterasim_mcp.models import PterasimInput, PterasimOutput
 
 
 @pytest.fixture()
@@ -30,20 +30,25 @@ def test_simulate_fallback(sample_input: PterasimInput) -> None:
     assert output.thrust_N > 0.0
     assert output.lift_N > 0.0
     assert output.torque_Nm > 0.0
+    assert output.metadata == {"solver": "analytic"}
 
 
-def test_simulate_with_native_module(sample_input: PterasimInput) -> None:
-    """When the real module is present we proxy straight through."""
-    fake_module = mock.Mock()
-    fake_module.simulate_wing.return_value = mock.Mock(
-        thrust=12.3,
-        lift=45.6,
-        torque=7.8,
+def test_simulate_with_pterasoftware(sample_input: PterasimInput) -> None:
+    """When PteraSoftware is available we use its results."""
+    sample_input.prefer_high_fidelity = True
+    high_fidelity_output = PterasimOutput(
+        thrust_N=12.3,
+        lift_N=45.6,
+        torque_Nm=7.8,
+        metadata={"solver": "pterasoftware"},
     )
 
-    with mock.patch("pterasim_mcp.core.PTR", fake_module):
+    with mock.patch("pterasim_mcp.core.is_available", return_value=True), mock.patch(
+        "pterasim_mcp.core.run_high_fidelity", return_value=high_fidelity_output
+    ):
         output = simulate_pterasim(sample_input)
 
     assert output.thrust_N == pytest.approx(12.3)
     assert output.lift_N == pytest.approx(45.6)
     assert output.torque_Nm == pytest.approx(7.8)
+    assert output.metadata == {"solver": "pterasoftware"}

@@ -2,43 +2,30 @@
 
 from __future__ import annotations
 
+import logging
 import math
-from importlib import import_module
-from typing import Any
 
 from .models import PterasimInput, PterasimOutput
+from .pterasoftware_adapter import is_available, run_high_fidelity
 
-try:  # pragma: no cover
-    PTR = import_module("pterasim")
-except ModuleNotFoundError:  # pragma: no cover
-    PTR = None
+LOGGER = logging.getLogger(__name__)
 
 
 def simulate_pterasim(inputs: PterasimInput) -> PterasimOutput:
-    """Simulate flapping wing performance.
+    """Simulate flapping wing performance."""
 
-    Uses the native `pterasim` module when available; otherwise performs a simplified analytic
-    estimate mirroring the legacy Orthodrone fallback.
-    """
-
-    if PTR is not None:  # pragma: no cover
+    if inputs.prefer_high_fidelity and is_available():
         try:
-            result: Any = PTR.simulate_wing(
-                span=inputs.span_m,
-                chord=inputs.mean_chord_m,
-                frequency=inputs.stroke_frequency_hz,
-                amplitude=inputs.stroke_amplitude_rad,
-                velocity=inputs.cruise_velocity_m_s,
-            )
-            return PterasimOutput(
-                thrust_N=float(result.thrust),
-                lift_N=float(result.lift),
-                torque_Nm=float(result.torque),
-            )
-        except Exception as exc:  # pragma: no cover
-            raise RuntimeError(str(exc)) from exc
+            result = run_high_fidelity(inputs)
+            if result is not None:
+                return result
+        except Exception as exc:  # pragma: no cover - fallback path
+            LOGGER.warning("High-fidelity PteraSoftware run failed, falling back to surrogate: %s", exc)
 
-    # Analytic fallback
+    return _analytic_surrogate(inputs)
+
+
+def _analytic_surrogate(inputs: PterasimInput) -> PterasimOutput:
     rho = inputs.air_density_kg_m3
     omega = 2.0 * math.pi * inputs.stroke_frequency_hz
     aspect_ratio = inputs.span_m**2 / inputs.planform_area_m2
@@ -56,7 +43,10 @@ def simulate_pterasim(inputs: PterasimInput) -> PterasimOutput:
         inputs.tail_moment_arm_m if inputs.tail_moment_arm_m is not None else inputs.span_m / 4.0
     )
     torque = lift * moment_arm
-    return PterasimOutput(thrust_N=thrust, lift_N=lift, torque_Nm=torque)
+    metadata = {
+        "solver": "analytic",
+    }
+    return PterasimOutput(thrust_N=thrust, lift_N=lift, torque_Nm=torque, metadata=metadata)
 
 
 __all__ = ["simulate_pterasim"]
