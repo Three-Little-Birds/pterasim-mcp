@@ -55,6 +55,8 @@ print(outputs)
 
 If `pterasim` is available the solver returns UVLM-based thrust, lift, and torque. Otherwise the wrapper computes a physics-informed approximation useful for prototyping and unit tests.
 
+Every response also includes a `metadata` field. When the UVLM solver runs you will see entries such as `{"solver": "pterasoftware", "solver_version": "0.10.1", "panel_count": 72}`; the fallback reports `{"solver": "analytic"}` so pipelines (or the CEE) know which fidelity produced the numbers.
+
 ## Step 3 – Compare design tweaks
 
 ```python
