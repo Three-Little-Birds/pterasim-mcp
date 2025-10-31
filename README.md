@@ -1,120 +1,95 @@
-# pterasim-mcp · Guided Flight for Flapping-Wing Learners
+# pterasim-mcp · UVLM + surrogate aerodynamics for MCP agents
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.10+-brightgreen.svg)](pyproject.toml)
-[![CI](https://github.com/Three-Little-Birds/pterasim-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Three-Little-Birds/pterasim-mcp/actions/workflows/ci.yml)
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="pyproject.toml"><img src="https://img.shields.io/badge/python-3.10%2B-3776AB.svg" alt="Python 3.10 or newer"></a>
+  <a href="https://github.com/Three-Little-Birds/pterasim-mcp/actions/workflows/ci.yml"><img src="https://github.com/Three-Little-Birds/pterasim-mcp/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+  <img src="https://img.shields.io/badge/status-incubating-ff9800.svg" alt="Project status: incubating">
+  <img src="https://img.shields.io/badge/MCP-tooling-blueviolet.svg" alt="MCP tooling badge">
+</p>
 
-`pterasim-mcp` wraps [PteraSoftware](https://github.com/camUrban/PteraSoftware) when it is available—and falls back to a lightweight analytic surrogate otherwise—so you can teach an MCP agent how flapping wings generate thrust, lift, and torque. The goal is to make aerodynamic experimentation approachable even if you are new to UVLM solvers.
+> **TL;DR**: Expose PteraSoftware’s analytical/UVLM solvers through MCP so agents can request aerodynamic coefficients with provenance metadata.
 
-## Learning objectives
+## Table of contents
 
-- Understand the input parameters that govern flapping-wing performance.
-- Run the simulator (or the deterministic fallback) from Python and interpret the results.
-- Expose the capability through an MCP tool so assistants can compare wing designs in real time.
+1. [Why agents love it](#why-agents-love-it)
+2. [Quickstart](#quickstart)
+3. [Run as a service](#run-as-a-service)
+4. [Agent playbook](#agent-playbook)
+5. [Stretch ideas](#stretch-ideas)
+6. [Accessibility & upkeep](#accessibility--upkeep)
+7. [Contributing](#contributing)
 
-## Requirements
+## Why agents love it
 
-| Component | Why it matters |
-|-----------|----------------|
-| `PteraSoftware` Python package (optional) | Installs the full UVLM solver. If missing, the analytic fallback still provides useful estimates. |
-| Python 3.10+ & `uv` | For installation and examples. |
-| NumPy/Matplotlib (optional) | Handy for plotting thrust or lift traces. |
+| Persona | Immediate value | Longer-term payoff |
+|---------|-----------------|--------------------|
+| **New users** | Request analytic polars without installing PteraSoftware manually. | Responses include solver metadata so you know whether the surrogate or UVLM path answered the call. |
+| **Experienced teams** | Switch to high-fidelity UVLM automatically when the Python 3.13 environment is present. | Metadata feeds the Continuous Evidence Engine (CEE), enabling solver-provenance dashboards.
 
-Install PteraSoftware if you want the high-fidelity solver:
+## Quickstart
 
-```bash
-pip install PteraSoftware
-```
-
-## Step 1 – Install the MCP helper
+### 1. Install
 
 ```bash
 uv pip install "git+https://github.com/Three-Little-Birds/pterasim-mcp.git"
 ```
 
-## Step 2 – Simulate a baseline wing
+### 2. Run an analytic solve
 
 ```python
-from pterasim_mcp import PterasimInput, simulate_pterasim
+from pterasim_mcp import PterasimRequest, run_simulation
 
-inputs = PterasimInput(
-    span_m=0.7,
-    mean_chord_m=0.12,
-    stroke_frequency_hz=6.0,
-    stroke_amplitude_rad=0.35,
-    cruise_velocity_m_s=8.0,
-    air_density_kg_m3=1.2,
-    cl_alpha_per_rad=5.5,
-    cd0=0.02,
-    planform_area_m2=0.18,
-)
-
-outputs = simulate_pterasim(inputs)
-print(outputs)
+request = PterasimRequest(num_timesteps=200, span_m=0.8, chord_m=0.12)
+response = run_simulation(request)
+print(response.metadata["solver"])
 ```
 
-If `pterasim` is available the solver returns UVLM-based thrust, lift, and torque. Otherwise the wrapper computes a physics-informed approximation useful for prototyping and unit tests.
+If a Python 3.13 environment with `PteraSoftware` is available, the wrapper will prefer UVLM and note the solver in the metadata.
 
-Every response also includes a `metadata` field. When the UVLM solver runs you will see entries such as `{"solver": "pterasoftware", "solver_version": "0.10.1", "panel_count": 72}`; the fallback reports `{"solver": "analytic"}` so pipelines (or the CEE) know which fidelity produced the numbers.
+## Run as a service
 
-## Step 3 – Compare design tweaks
-
-```python
-for freq in [5.0, 6.0, 7.0]:
-    trial = inputs.model_copy(update={"stroke_frequency_hz": freq})
-    perf = simulate_pterasim(trial)
-    print(f"{freq} Hz -> thrust {perf.thrust_N:.2f} N, lift {perf.lift_N:.2f} N")
-```
-
-Use the loop above to build an intuition for how frequency or stroke amplitude affect performance.
-
-## Step 4 – Share the simulator via MCP
-
-### FastAPI service
-
-```python
-from pterasim_mcp.fastapi_app import create_app
-
-app = create_app()
-```
-
-Run locally:
+### FastAPI (REST)
 
 ```bash
 uv run uvicorn pterasim_mcp.fastapi_app:create_app --factory --port 8003
 ```
 
-### python-sdk tool
+### python-sdk tool (STDIO / MCP)
 
 ```python
 from mcp.server.fastmcp import FastMCP
 from pterasim_mcp.tool import build_tool
 
-mcp = FastMCP("pterasim-mcp", "Flapping wing simulation")
+mcp = FastMCP("pterasim-mcp", "Wing UVLM & surrogate solver")
 build_tool(mcp)
 
 if __name__ == "__main__":
     mcp.run()
 ```
 
-Now your MCP-aware agent can evaluate alternative wing plans on demand.
+## Agent playbook
 
-## Experiment ideas
+- **Scenario sweeps** – vary span, frequency, or flapping amplitude and log derivatives for control studies.
+- **Solver comparison** – leverage metadata to benchmark surrogate vs UVLM deltas, feeding results into the CEE.
+- **Design flows** – combine with `openvsp-mcp` to generate geometry + aerodynamics pipelines.
 
-- **Mission profiling:** sweep cruise velocities to identify lift margins throughout a flight segment.
-- **Material study:** combine outputs with ctrltest-mcp to see how actuator limits interact with aerodynamic loads.
-- **Curriculum project:** ask students to hit a target thrust while minimising torque using the MCP tool.
+## Stretch ideas
 
-## Contributing & tests
+1. Generate JSONL experiment logs that feed directly into `ctrltest-mcp` or reinforcement-learning agents.
+2. Use the metadata to route results into Grafana dashboards for solver provenance.
+3. Auto-promote surrogate runs to UVLM once a high-fidelity environment is detected.
 
-```bash
-uv pip install --system -e .[dev]
-uv run ruff check .
-uv run pytest
-```
+## Accessibility & upkeep
 
-Tests cover both the UVLM path (when the module is present) and the fallback to keep behaviour predictable.
+- Badges are limited and carry alt text for screen-readers, matching modern README style guidance.【turn0search0】
+- Tests simulate solver responses; run `uv run pytest` before pushing.
+- Keep `.venv-pterasim` aligned with the PteraSoftware version you report in metadata.
 
-## License
+## Contributing
 
-MIT — see [LICENSE](LICENSE).
+1. `uv pip install --system -e .[dev]`
+2. Run `uv run ruff check .` and `uv run pytest`
+3. Include sample metadata/CSV artefacts in PRs so reviewers can confirm provenance handling.
+
+MIT license — see [LICENSE](LICENSE).
