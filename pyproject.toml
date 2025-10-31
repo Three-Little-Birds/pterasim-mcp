@@ -19,8 +19,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yevheniikravchuk/pterasim-mcp"
-Repository = "https://github.com/yevheniikravchuk/pterasim-mcp"
+Homepage = "https://github.com/Three-Little-Birds/pterasim-mcp"
+Repository = "https://github.com/Three-Little-Birds/pterasim-mcp"
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]

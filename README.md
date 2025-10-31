@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10+-brightgreen.svg)](pyproject.toml)
-[![CI](https://github.com/yevheniikravchuk/pterasim-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/yevheniikravchuk/pterasim-mcp/actions/workflows/ci.yml)
+[![CI](https://github.com/Three-Little-Birds/pterasim-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Three-Little-Birds/pterasim-mcp/actions/workflows/ci.yml)
 
 `pterasim-mcp` wraps [PteraSoftware](https://github.com/camUrban/PteraSoftware) when it is available—and falls back to a lightweight analytic surrogate otherwise—so you can teach an MCP agent how flapping wings generate thrust, lift, and torque. The goal is to make aerodynamic experimentation approachable even if you are new to UVLM solvers.
 
@@ -29,7 +29,7 @@ pip install PteraSoftware
 ## Step 1 – Install the MCP helper
 
 ```bash
-uv pip install "git+https://github.com/yevheniikravchuk/pterasim-mcp.git"
+uv pip install "git+https://github.com/Three-Little-Birds/pterasim-mcp.git"
 ```
 
 ## Step 2 – Simulate a baseline wing
