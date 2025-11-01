@@ -49,6 +49,15 @@ If a Python 3.13 environment with `PteraSoftware` is available, the wrapper will
 
 ## Run as a service
 
+### CLI (STDIO transport)
+
+```bash
+uvx pterasim-mcp  # runs the MCP over stdio
+# or python -m pterasim_mcp
+```
+
+Use `python -m pterasim_mcp --describe` to emit metadata without starting the server.
+
 ### FastAPI (REST)
 
 ```bash
