@@ -1,4 +1,4 @@
-# pterasim-mcp · UVLM + surrogate aerodynamics for MCP agents
+# pterasim-mcp - UVLM + surrogate aerodynamics for MCP agents
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/MCP-tooling-blueviolet.svg" alt="MCP tooling badge">
 </p>
 
-> **TL;DR**: Expose PteraSoftware’s analytical/UVLM solvers through MCP so agents can request aerodynamic coefficients with provenance metadata.
+> **TL;DR**: Expose PteraSoftware's analytical/UVLM solvers through MCP so agents can request aerodynamic coefficients with provenance metadata.
 
 ## Table of contents
 
@@ -70,9 +70,9 @@ if __name__ == "__main__":
 
 ## Agent playbook
 
-- **Scenario sweeps** – vary span, frequency, or flapping amplitude and log derivatives for control studies.
-- **Solver comparison** – leverage metadata to benchmark surrogate vs UVLM deltas, feeding results into the CEE.
-- **Design flows** – combine with `openvsp-mcp` to generate geometry + aerodynamics pipelines.
+- **Scenario sweeps** - vary span, frequency, or flapping amplitude and log derivatives for control studies.
+- **Solver comparison** - leverage metadata to benchmark surrogate vs UVLM deltas, feeding results into the CEE.
+- **Design flows** - combine with `openvsp-mcp` to generate geometry + aerodynamics pipelines.
 
 ## Stretch ideas
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
 ## Accessibility & upkeep
 
-- Badges are limited and carry alt text for screen-readers, matching modern README style guidance.【turn0search0】
+- Badges are limited and carry alt text for screen-readers, matching modern README style guidance.[turn0search0]
 - Tests simulate solver responses; run `uv run pytest` before pushing.
 - Keep `.venv-pterasim` aligned with the PteraSoftware version you report in metadata.
 
@@ -92,4 +92,4 @@ if __name__ == "__main__":
 2. Run `uv run ruff check .` and `uv run pytest`
 3. Include sample metadata/CSV artefacts in PRs so reviewers can confirm provenance handling.
 
-MIT license — see [LICENSE](LICENSE).
+MIT license - see [LICENSE](LICENSE).
