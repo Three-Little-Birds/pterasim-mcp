@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
 ## Accessibility & upkeep
 
-- Badges are limited and carry alt text for screen-readers, matching modern README style guidance.[turn0search0]
+- Badges are limited and carry alt text for screen-readers, matching modern README style guidance.
 - Tests simulate solver responses; run `uv run pytest` before pushing.
 - Keep `.venv-pterasim` aligned with the PteraSoftware version you report in metadata.
 
