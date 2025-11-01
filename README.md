@@ -77,6 +77,12 @@ if __name__ == "__main__":
     mcp.run()
 ```
 
+### ToolHive smoke test
+
+```bash
+uvx --with 'mcp==1.20.0' python scripts/integration/run_pterasim.py
+```
+
 ## Agent playbook
 
 - **Scenario sweeps** - vary span, frequency, or flapping amplitude and log derivatives for control studies.
