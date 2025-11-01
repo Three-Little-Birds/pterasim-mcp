@@ -11,7 +11,7 @@
 
 ## Table of contents
 
-1. [Why agents love it](#why-agents-love-it)
+1. [What it provides](#what-it-provides)
 2. [Quickstart](#quickstart)
 3. [Run as a service](#run-as-a-service)
 4. [Agent playbook](#agent-playbook)
@@ -19,12 +19,13 @@
 6. [Accessibility & upkeep](#accessibility--upkeep)
 7. [Contributing](#contributing)
 
-## Why agents love it
+## What it provides
 
-| Persona | Immediate value | Longer-term payoff |
-|---------|-----------------|--------------------|
-| **New users** | Request analytic polars without installing PteraSoftware manually. | Responses include solver metadata so you know whether the surrogate or UVLM path answered the call. |
-| **Experienced teams** | Switch to high-fidelity UVLM automatically when the Python 3.13 environment is present. | Metadata feeds the Continuous Evidence Engine (CEE), enabling solver-provenance dashboards.
+| Scenario | Value |
+|----------|-------|
+| Surrogate aerodynamics | Evaluate lightweight rigid-vortex-lattice models without a GUI, returning aerodynamic coefficients as structured data. |
+| High-fidelity UVLM | When [PteraSoftware](https://github.com/pterasoftware/PteraSoftware) is installed, the service switches to its UVLM solver and records provenance metadata. |
+| Controller integration | Provide consistent outputs that downstream MCP tools (e.g., `ctrltest-mcp`) can ingest for control and evidence pipelines. |
 
 ## Quickstart
 
