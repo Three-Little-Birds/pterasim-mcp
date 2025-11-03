@@ -49,11 +49,12 @@ If a Python 3.13 environment with `PteraSoftware` is available, the wrapper will
 
 ## Run as a service
 
-### CLI (STDIO transport)
+### CLI (STDIO / Streamable HTTP)
 
 ```bash
 uvx pterasim-mcp  # runs the MCP over stdio
 # or python -m pterasim_mcp
+python -m pterasim_mcp --transport streamable-http --host 0.0.0.0 --port 8000 --path /mcp
 ```
 
 Use `python -m pterasim_mcp --describe` to emit metadata without starting the server.
@@ -81,6 +82,8 @@ if __name__ == "__main__":
 
 ```bash
 uvx --with 'mcp==1.20.0' python scripts/integration/run_pterasim.py
+# ToolHive 2025+ defaults to Streamable HTTP; match that transport when registering
+# the workload manually so IDE clients avoid the SSE 502 bug.
 ```
 
 ## Agent playbook
