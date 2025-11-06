@@ -43,7 +43,17 @@ from pterasim_mcp import PterasimRequest, run_simulation
 request = PterasimRequest(num_timesteps=200, span_m=0.8, chord_m=0.12)
 response = run_simulation(request)
 print(response.metadata["solver"])            # "analytic" or "pterasoftware_uvlm"
-print(response.outputs["aero_coefficients"]) # CSV with thrust/lift/torque history
+print(response.thrust_N, response.lift_N, response.torque_Nm)
+
+Typical metadata payload:
+
+```json
+{
+  "solver": "pterasoftware_uvlm",
+  "thrust_delta_pct_vs_analytic": -4.1,
+  "lift_delta_pct_vs_analytic": -2.7
+}
+```
 ```
 
 If a Python 3.13 environment with `PteraSoftware` (≥3.2) is available, the wrapper will prefer UVLM and note the solver in the metadata. Install it inside a dedicated environment:
@@ -56,7 +66,7 @@ pip install pterasoftware==3.2.0
 uv pip install "git+https://github.com/Three-Little-Birds/pterasim-mcp.git"
 ```
 
-The analytic-only mode works on Python 3.11 without `PteraSoftware`.
+If the UVLM solve fails for any reason (missing binaries, convergence issues), the wrapper logs a warning and falls back to the analytic surrogate—you will see `solver: "analytic"` in the metadata and no delta fields. UVLM runs with thousands of timesteps can take minutes; batch analytic sweeps first and promote only promising cases to the high-fidelity environment. Analytic-only mode works on Python 3.11 without `PteraSoftware`.
 
 ## Run as a service
 
