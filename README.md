@@ -38,10 +38,20 @@ uv pip install "git+https://github.com/Three-Little-Birds/pterasim-mcp.git"
 ### 2. Run an analytic solve
 
 ```python
-from pterasim_mcp import PterasimRequest, run_simulation
+from pterasim_mcp import PterasimInput, simulate_pterasim
 
-request = PterasimRequest(num_timesteps=200, span_m=0.8, chord_m=0.12)
-response = run_simulation(request)
+request = PterasimInput(
+    span_m=0.8,
+    mean_chord_m=0.12,
+    stroke_frequency_hz=12.0,
+    stroke_amplitude_rad=0.55,
+    cruise_velocity_m_s=6.0,
+    air_density_kg_m3=1.225,
+    cl_alpha_per_rad=6.2,
+    cd0=0.03,
+    planform_area_m2=0.18,
+)
+response = simulate_pterasim(request)
 print(response.metadata["solver"])            # "analytic" or "pterasoftware_uvlm"
 print(response.thrust_N, response.lift_N, response.torque_Nm)
 
