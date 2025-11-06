@@ -76,7 +76,7 @@ pip install pterasoftware==3.2.0
 uv pip install "git+https://github.com/Three-Little-Birds/pterasim-mcp.git"
 ```
 
-If the UVLM solve fails for any reason (missing binaries, convergence issues), the wrapper logs a warning and falls back to the analytic surrogate—you will see `solver: "analytic"` in the metadata and no delta fields. UVLM runs with thousands of timesteps can take minutes; batch analytic sweeps first and promote only promising cases to the high-fidelity environment. Analytic-only mode works on Python 3.11 without `PteraSoftware`.
+If the UVLM solve fails for any reason (missing binaries, convergence issues, or the current `PteraSoftware` regression that removes `geometry.airfoil`), the wrapper logs a warning and falls back to the analytic surrogate—you will see `solver: "analytic"` in the metadata and no delta fields. UVLM runs with thousands of timesteps can take minutes; batch analytic sweeps first and promote only promising cases to the high-fidelity environment. Analytic-only mode works on Python 3.11 without `PteraSoftware`. Until the UVLM API stabilizes upstream, treat the analytic path as the supported/default mode.
 
 ## Run as a service
 
