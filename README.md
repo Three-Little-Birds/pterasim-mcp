@@ -42,10 +42,21 @@ from pterasim_mcp import PterasimRequest, run_simulation
 
 request = PterasimRequest(num_timesteps=200, span_m=0.8, chord_m=0.12)
 response = run_simulation(request)
-print(response.metadata["solver"])
+print(response.metadata["solver"])            # "analytic" or "pterasoftware_uvlm"
+print(response.outputs["aero_coefficients"]) # CSV with thrust/lift/torque history
 ```
 
-If a Python 3.13 environment with `PteraSoftware` is available, the wrapper will prefer UVLM and note the solver in the metadata.
+If a Python 3.13 environment with `PteraSoftware` (≥3.2) is available, the wrapper will prefer UVLM and note the solver in the metadata. Install it inside a dedicated environment:
+
+```bash
+uv python install 3.13
+uv venv .venv-pterasim --python 3.13
+source .venv-pterasim/bin/activate
+pip install pterasoftware==3.2.0
+uv pip install "git+https://github.com/Three-Little-Birds/pterasim-mcp.git"
+```
+
+The analytic-only mode works on Python 3.11 without `PteraSoftware`.
 
 ## Run as a service
 
@@ -89,7 +100,7 @@ uvx --with 'mcp==1.20.0' python scripts/integration/run_pterasim.py
 ## Agent playbook
 
 - **Scenario sweeps** - vary span, frequency, or flapping amplitude and log derivatives for control studies.
-- **Solver comparison** - leverage metadata to benchmark surrogate vs UVLM deltas, feeding results into the CEE.
+- **Solver comparison** - leverage metadata to benchmark surrogate vs UVLM deltas and store the comparisons for regression dashboards.
 - **Design flows** - combine with `openvsp-mcp` to generate geometry + aerodynamics pipelines.
 
 ## Stretch ideas
