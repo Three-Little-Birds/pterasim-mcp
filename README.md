@@ -9,6 +9,10 @@
 
 > **TL;DR**: Expose PteraSoftware's analytical/UVLM solvers through MCP so agents can request aerodynamic coefficients with provenance metadata.
 
+<a href="https://glama.ai/mcp/servers/@yevheniikravchuk/pterasim-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@yevheniikravchuk/pterasim-mcp/badge" alt="Pterasim Server MCP server" />
+</a>
+
 ## Table of contents
 
 1. [What it provides](#what-it-provides)
